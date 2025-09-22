@@ -1,19 +1,13 @@
+# multiclass-emotion-recognition
+An implementation of multi-label and multi-class emotion classification using transformer models on the Go_Emotions dataset. This project compares RoBERTa, XLNet, and ELECTRA architectures for recognizing 28 emotion categories in Reddit comments.
+
 ### Training Strategy
 
 #### Optimization Parameters
-&#8203; **Optimizer**: AdamW  
-&#8203; **Weight Decay**: 0.1  
-&#8203; **Dropout**: 0.5  
-&#8203; **Mixed Precision**: PyTorch AMP with GradScaler  
-&#8203; **Batch Size**: 16  
-&#8203; **Max Sequence Length**: 128 tokens  
-&#8203; **Classification Threshold**: 0.4  
+The models used AdamW optimizer with a weight decay of 0.1 and dropout rate of 0.5. Training employed PyTorch AMP with GradScaler for mixed precision, using a batch size of 16 and maximum sequence length of 128 tokens. All models used a classification threshold of 0.4 for final predictions.
 
 #### Hyperparameter Search
-&#8203; **Learning Rates**: [5e-5, 1e-5, 7e-6]  
-&#8203; **Focal Loss Gamma**: [2, 3]  
-&#8203; **Training Epochs**: 3 (hyperparameter tuning) + up to 5 (extended training)  
-&#8203; **Early Stopping**: Patience of 2 epochs based on validation F1-score  
+The search space included learning rates of 5e-5, 1e-5, and 7e-6, combined with Focal Loss gamma values of 2 and 3. Models underwent 3 epochs during hyperparameter tuning followed by up to 5 additional epochs in extended training. Early stopping was implemented with a patience of 2 epochs based on validation F1-score improvements.
 
 #### Best Configurations
 
@@ -25,42 +19,18 @@
 
 ### Class Imbalance Solutions
 
-#### Multi-Label Random Oversampling (ML-ROS)
-&#8203; **Algorithm**: Custom implementation preserving emotion co-occurrence patterns  
-&#8203; **Target Strategy**: Median count × sampling ratio (default: 0.5)  
-&#8203; **Max Ratio**: 3× original count to prevent excessive duplication  
-&#8203; **Results**: Dataset size increased from 43,410 to 44,987 samples (+1,577)  
-&#8203; **Preservation**: Maintained 711 unique label combinations  
+The project addressed class imbalance through three complementary approaches. First, a custom Multi-Label Random Oversampling (ML-ROS) algorithm was implemented to preserve emotion co-occurrence patterns while increasing representation of minority classes. The algorithm targeted a median count multiplied by a sampling ratio of 0.5, with a maximum ratio of 3× the original count to prevent excessive duplication. This approach increased the dataset size from 43,410 to 44,987 samples, adding 1,577 instances while maintaining all 711 unique label combinations.
 
-#### Focal Loss Implementation
-&#8203; **Formula**: `FL(pt) = -α(1-pt)^γ log(pt)`  
-&#8203; **Purpose**: Down-weight easy examples, focus on hard-to-classify instances  
-&#8203; **Adaptation**: Modified for multi-label classification with logits  
-&#8203; **Parameters**: α (balancing factor), γ (focusing parameter)  
+Second, a custom Focal Loss implementation was developed specifically for multi-label classification. The loss function follows the formula `FL(pt) = -α(1-pt)^γ log(pt)`, where α provides class balancing and γ focuses attention on hard-to-classify instances. The implementation was adapted for multi-label scenarios using logits for numerical stability.
 
-#### Evaluation Strategy
-&#8203; **Weighted Metrics**: Account for class distribution in final scores  
-&#8203; **Macro Averaging**: Equal weight to all emotions regardless of frequency  
-&#8203; **Per-class Analysis**: Individual precision, recall, F1 for each emotion  
+Third, the evaluation strategy employed weighted metrics to account for class distribution, macro averaging to give equal weight to all emotions regardless of frequency, and detailed per-class analysis providing individual precision, recall, and F1-scores for each emotion category.
 
 ### Key Innovations
 
-#### Controlled Oversampling Algorithm
-&#8203; Maintains natural emotion co-occurrence patterns while boosting minority classes  
-&#8203; Preserves authentic label relationships from original dataset  
-&#8203; Avoids synthetic data generation that might introduce artifacts  
+The controlled oversampling algorithm represents a novel approach to multi-label imbalance, maintaining natural emotion co-occurrence patterns while boosting minority class representation. Unlike synthetic oversampling techniques, this method preserves authentic label relationships from the original dataset.
 
-#### Custom Focal Loss for Multi-Label
-&#8203; Adapted binary cross-entropy focal loss for 28-class multi-label scenario  
-&#8203; Addresses both class imbalance and hard example focus simultaneously  
-&#8203; Numerically stable implementation with logits and epsilon smoothing  
+The custom Focal Loss adaptation for multi-label classification addresses both class imbalance and hard example focus simultaneously. The implementation uses numerically stable computations with logits and epsilon smoothing to prevent numerical instabilities during training.
 
-#### No Preprocessing Philosophy
-&#8203; Preserves emotional nuances in raw text based on recent research findings  
-&#8203; Special handling with `[NAME]` and `[RELIGION]` tokens added to vocabularies  
-&#8203; Maintains authenticity of Reddit comment language patterns  
+The decision to avoid preprocessing was based on recent research by Siino et al. (2024) showing that minimal preprocessing often performs comparably to extensive text cleaning for transformer models. This approach preserved emotional nuances in raw text while adding special tokens `[NAME]` and `[RELIGION]` to handle anonymized content in the dataset.
 
-#### Architecture Modifications
-&#8203; Unified [CLS] token pooling strategy across all three models  
-&#8203; Consistent 0.5 dropout rate before final classification layer  
-&#8203; 28 independent sigmoid units for multi-label prediction output
+Architecture modifications ensured fair comparison across all three models by implementing unified pooling using [CLS] token representation, consistent dropout of 0.5 before the final classification layer, and identical 28-unit output layers with independent sigmoid units for multi-label prediction.
