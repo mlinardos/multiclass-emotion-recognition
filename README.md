@@ -1,59 +1,19 @@
-# multiclass-emotion-recognition
-An implementation of multi-label and multi-class emotion classification using transformer models on the Go_Emotions dataset. This project compares RoBERTa, XLNet, and ELECTRA architectures for recognizing 28 emotion categories in Reddit comments.
-
-<div align="center">
-
-| Model | Weighted F1-Score | Precision | Recall | ROC-AUC |
-|:-----:|:-----------------:|:---------:|:------:|:-------:|
-| **RoBERTa** | **0.6043** | 0.5542 | 0.6818 | 0.83 |
-| ELECTRA | 0.6032 | 0.5464 | 0.6870 | 0.83 |
-| XLNet | 0.5709 | 0.5062 | 0.6889 | 0.83 |
-
-
-### Findings
-- **Best Performance**: RoBERTa achieved the highest weighted F1-score (0.6043)
-- **Strong Emotions**: All models excelled at positive emotions like gratitude (F1: 0.89-0.90), amusement (F1: 0.81-0.83), and love (F1: 0.77-0.81)
-- **Challenging Emotions**: Models struggled with complex emotions like realization (F1: 0.21-0.26) and disappointment (F1: 0.28-0.34)
-- **Class Imbalance**: Custom oversampling + Focal Loss improved rare emotion detection
-
-
-<details>
-<summary>Top Performing Emotions by Model</summary>
-
-**RoBERTa**
-- Gratitude: 0.90 F1-score
-- Amusement: 0.83 F1-score  
-- Love: 0.80 F1-score
-
-**ELECTRA**
-- Gratitude: 0.89 F1-score
-- Amusement: 0.83 F1-score
-- Love: 0.81 F1-score
-
-**XLNet**
-- Gratitude: 0.84 F1-score
-- Amusement: 0.81 F1-score
-- Love: 0.77 F1-score
-
-</details>
-
-
 ### Training Strategy
 
 #### Optimization Parameters
-- **Optimizer**: AdamW
-- **Weight Decay**: 0.1
-- **Dropout**: 0.5
-- **Mixed Precision**: PyTorch AMP with GradScaler
-- **Batch Size**: 16
-- **Max Sequence Length**: 128 tokens
-- **Classification Threshold**: 0.4
+&#8203; **Optimizer**: AdamW  
+&#8203; **Weight Decay**: 0.1  
+&#8203; **Dropout**: 0.5  
+&#8203; **Mixed Precision**: PyTorch AMP with GradScaler  
+&#8203; **Batch Size**: 16  
+&#8203; **Max Sequence Length**: 128 tokens  
+&#8203; **Classification Threshold**: 0.4  
 
 #### Hyperparameter Search
-- **Learning Rates**: [5e-5, 1e-5, 7e-6]
-- **Focal Loss Gamma**: [2, 3]
-- **Training Epochs**: 3 (hyperparameter tuning) + up to 5 (extended training)
-- **Early Stopping**: Patience of 2 epochs based on validation F1-score
+&#8203; **Learning Rates**: [5e-5, 1e-5, 7e-6]  
+&#8203; **Focal Loss Gamma**: [2, 3]  
+&#8203; **Training Epochs**: 3 (hyperparameter tuning) + up to 5 (extended training)  
+&#8203; **Early Stopping**: Patience of 2 epochs based on validation F1-score  
 
 #### Best Configurations
 
@@ -65,28 +25,42 @@ An implementation of multi-label and multi-class emotion classification using tr
 
 ### Class Imbalance Solutions
 
-#### 1. Multi-Label Random Oversampling (ML-ROS)
-- **Algorithm**: Custom implementation preserving emotion co-occurrence patterns
-- **Target Strategy**: Median count × sampling ratio (default: 0.5)
-- **Max Ratio**: 3× original count to prevent excessive duplication
-- **Results**: Dataset size increased from 43,410 to 44,987 samples (+1,577)
-- **Preservation**: Maintained 711 unique label combinations
+#### Multi-Label Random Oversampling (ML-ROS)
+&#8203; **Algorithm**: Custom implementation preserving emotion co-occurrence patterns  
+&#8203; **Target Strategy**: Median count × sampling ratio (default: 0.5)  
+&#8203; **Max Ratio**: 3× original count to prevent excessive duplication  
+&#8203; **Results**: Dataset size increased from 43,410 to 44,987 samples (+1,577)  
+&#8203; **Preservation**: Maintained 711 unique label combinations  
 
-#### 2. Focal Loss Implementation
-- **Formula**: `FL(pt) = -α(1-pt)^γ log(pt)`
-- **Purpose**: Down-weight easy examples, focus on hard-to-classify instances
-- **Adaptation**: Modified for multi-label classification with logits
-- **Parameters**: α (balancing factor), γ (focusing parameter)
+#### Focal Loss Implementation
+&#8203; **Formula**: `FL(pt) = -α(1-pt)^γ log(pt)`  
+&#8203; **Purpose**: Down-weight easy examples, focus on hard-to-classify instances  
+&#8203; **Adaptation**: Modified for multi-label classification with logits  
+&#8203; **Parameters**: α (balancing factor), γ (focusing parameter)  
 
-#### 3. Evaluation Strategy
-- **Weighted Metrics**: Account for class distribution in final scores
-- **Macro Averaging**: Equal weight to all emotions regardless of frequency
-- **Per-class Analysis**: Individual precision, recall, F1 for each emotion
+#### Evaluation Strategy
+&#8203; **Weighted Metrics**: Account for class distribution in final scores  
+&#8203; **Macro Averaging**: Equal weight to all emotions regardless of frequency  
+&#8203; **Per-class Analysis**: Individual precision, recall, F1 for each emotion  
+
+### Key Innovations
 
 #### Controlled Oversampling Algorithm
-```python
-# Pseudocode for ML-ROS implementation
-for emotion in underrepresented_emotions:
-    if current_count < median_count:
-        target_count = min(median * 0.5, current_count * 3)
-        oversample_instances(emotion, target_count)
+&#8203; Maintains natural emotion co-occurrence patterns while boosting minority classes  
+&#8203; Preserves authentic label relationships from original dataset  
+&#8203; Avoids synthetic data generation that might introduce artifacts  
+
+#### Custom Focal Loss for Multi-Label
+&#8203; Adapted binary cross-entropy focal loss for 28-class multi-label scenario  
+&#8203; Addresses both class imbalance and hard example focus simultaneously  
+&#8203; Numerically stable implementation with logits and epsilon smoothing  
+
+#### No Preprocessing Philosophy
+&#8203; Preserves emotional nuances in raw text based on recent research findings  
+&#8203; Special handling with `[NAME]` and `[RELIGION]` tokens added to vocabularies  
+&#8203; Maintains authenticity of Reddit comment language patterns  
+
+#### Architecture Modifications
+&#8203; Unified [CLS] token pooling strategy across all three models  
+&#8203; Consistent 0.5 dropout rate before final classification layer  
+&#8203; 28 independent sigmoid units for multi-label prediction output
