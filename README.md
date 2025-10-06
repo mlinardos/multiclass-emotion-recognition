@@ -25,7 +25,7 @@ Second, a custom Focal Loss implementation was developed specifically for multi-
 
 Third, the evaluation strategy employed weighted metrics to account for class distribution, macro averaging to give equal weight to all emotions regardless of frequency, and detailed per-class analysis providing individual precision, recall, and F1-scores for each emotion category.
 
-### Key Innovations
+### Key Decisions
 
 The controlled oversampling algorithm represents a novel approach to multi-label imbalance, maintaining natural emotion co-occurrence patterns while boosting minority class representation. Unlike synthetic oversampling techniques, this method preserves authentic label relationships from the original dataset.
 
