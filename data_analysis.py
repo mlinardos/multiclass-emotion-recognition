@@ -1,9 +1,12 @@
+import os
 import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
+
+os.makedirs('figures', exist_ok=True)
 
 
 def count_emotions(split, emotion_names):
@@ -228,7 +231,7 @@ def run_analysis(ds, emotion_names):
     plt.xticks(rotation=45, ha='right', fontsize=12)
     plt.yticks(fontsize=12)
     plt.tight_layout()
-    plt.savefig('distribution_all.png')
+    plt.savefig('figures/distribution_all.png')
     plt.show()
     plt.close()
 

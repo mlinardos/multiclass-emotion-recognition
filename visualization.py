@@ -1,7 +1,10 @@
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 from sklearn.metrics import precision_recall_curve, average_precision_score, roc_curve, auc
+
+os.makedirs('figures', exist_ok=True)
 
 
 def plot_distribution(df, title):
@@ -13,7 +16,7 @@ def plot_distribution(df, title):
     plt.xticks(rotation=45, ha='right', fontsize=12)
     plt.yticks(fontsize=12)
     plt.tight_layout()
-    plt.savefig(f'distribution_{title.lower()}.png')
+    plt.savefig(f'figures/distribution_{title.lower()}.png')
     plt.show()
     plt.close()
 
@@ -40,7 +43,7 @@ def plot_performance_curves(y_true, y_pred, model_name):
     plt.title(f'{model_name} Micro-average ROC curve\nAUC = {roc_auc:.2f}')
 
     plt.tight_layout()
-    plt.savefig(f'{model_name}_performance_curves.png')
+    plt.savefig(f'figures/{model_name}_performance_curves.png')
     plt.show()
     plt.close()
 
@@ -54,7 +57,7 @@ def hyperparameter_tuning_plots(results, model_name, num_epochs):
     plt.ylabel('Training Loss')
     plt.title(f'{model_name} Training Loss During Hyperparameter Tuning')
     plt.legend()
-    plt.savefig(f'{model_name}_hyperparameter_tuning_loss.png')
+    plt.savefig(f'figures/{model_name}_hyperparameter_tuning_loss.png')
     plt.show()
     plt.close()
 
@@ -66,7 +69,7 @@ def hyperparameter_tuning_plots(results, model_name, num_epochs):
     plt.ylabel('F1 Score')
     plt.title(f'{model_name} F1 Score During Hyperparameter Tuning')
     plt.legend()
-    plt.savefig(f'{model_name}_hyperparameter_tuning_f1.png')
+    plt.savefig(f'figures/{model_name}_hyperparameter_tuning_f1.png')
     plt.show()
     plt.close()
 
@@ -80,7 +83,7 @@ def final_model_plots(total_epochs, best_epoch, train_losses, val_losses, val_f1
     plt.ylabel('Loss')
     plt.title(f'{model_name} Training and Validation Loss')
     plt.legend()
-    plt.savefig(f'{model_name}_training_validation_loss.png')
+    plt.savefig(f'figures/{model_name}_training_validation_loss.png')
     plt.show()
     plt.close()
 
@@ -91,6 +94,6 @@ def final_model_plots(total_epochs, best_epoch, train_losses, val_losses, val_f1
     plt.ylabel('F1 Score')
     plt.title(f'{model_name} Validation F1 Score')
     plt.legend()
-    plt.savefig(f'{model_name}_validation_f1_score.png')
+    plt.savefig(f'figures/{model_name}_validation_f1_score.png')
     plt.show()
     plt.close()
