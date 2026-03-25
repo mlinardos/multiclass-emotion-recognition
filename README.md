@@ -1,6 +1,18 @@
 # multiclass-emotion-recognition
 An implementation of multi-label and multi-class emotion classification using transformer models on the Go_Emotions dataset. This project compares RoBERTa, XLNet, and ELECTRA architectures for recognizing 28 emotion categories in Reddit comments.
 
+## How to Run
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run
+python main.py
+```
+
+The GoEmotions dataset is downloaded automatically via HuggingFace. Training all three models sequentially will produce plots saved to the `figures/` folder and model checkpoints saved as `.pth` files.
+
 ### Training Strategy
 
 #### Optimization Parameters
