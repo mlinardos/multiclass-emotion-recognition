@@ -4,7 +4,7 @@ from datasets import load_dataset
 
 
 def load_go_emotions():
-    ds = load_dataset("go_emotions", "simplified")
+    ds = load_dataset("google-research-datasets/go_emotions", "simplified")
     emotion_names = ds['train'].features['labels'].feature.names
     num_labels = len(emotion_names)
     return ds, emotion_names, num_labels
